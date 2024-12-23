@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: backend-service
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    buildCommand: ""
+    startCommand: "python app.py"
+    plan: free
+
+  - type: web
+    name: frontend-service
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    buildCommand: ""
+    startCommand: ""
+    plan: free
+
+  - type: worker
+    name: worker-service
+    env: docker
+    dockerfilePath: ./worker/Dockerfile
+    buildCommand: ""
+    startCommand: "python worker.py"
+    plan: free
