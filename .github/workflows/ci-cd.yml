@@ -37,10 +37,24 @@ jobs:
       - name: Start backend container
         run: docker run -d --name backend-test -p 5000:5000 sorenty/order-managment-backend:latest
 
-      # Шаг 7: Проверяем работу контейнера
+      # Шаг 7: Ждем, пока сервер будет готов
+      - name: Wait for the server to start
+        run: |
+          for i in {1..10}; do
+            if curl -s http://localhost:5000 > /dev/null; then
+              echo "Server is ready."
+              exit 0
+            fi
+            echo "Waiting for server..."
+            sleep 5
+          done
+          echo "Server did not start in time."
+          exit 1
+
+      # Шаг 8: Проверяем работу контейнера
       - name: Test backend container
         run: curl http://localhost:5000
 
-      # Шаг 8: Останавливаем и удаляем контейнер
+      # Шаг 9: Останавливаем и удаляем контейнер
       - name: Stop and remove backend container
         run: docker stop backend-test && docker rm backend-test
