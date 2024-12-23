@@ -4,22 +4,16 @@ services:
     env: docker
     dockerfilePath: ./backend/Dockerfile
     buildCommand: ""
-    startCommand: "python app.py"  # Здесь запускается ваш backend (Flask или другой)
+    startCommand: "python app.py"
     plan: free
-    envVars:
-      - key: API_BASE_URL
-        value: "http://backend-service:5000"  # Указание на имя сервиса бэкенда, чтобы фронтенд знал, куда отправлять запросы.
 
   - type: web
     name: frontend-service
     env: docker
     dockerfilePath: ./frontend/Dockerfile
     buildCommand: ""
-    startCommand: "npm start"  # Убедитесь, что ваш frontend знает, как его запускать (например, через сервер, если используется React или подобное).
+    startCommand: ""
     plan: free
-    envVars:
-      - key: API_BASE_URL
-        value: "http://backend-service:5000"  # Убедитесь, что фронтенд знает, где найти бэкенд по имени сервиса.
 
   - type: worker
     name: worker-service
