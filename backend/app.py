@@ -1,5 +1,5 @@
 import logging
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 import redis
 from flask_cors import CORS
@@ -49,7 +49,8 @@ class Item(db.Model):
 
 @app.route('/', methods=['GET'])
 def home():
-    return jsonify({"message": "Welcome to the server!"})
+    # Отправляем запрос на фронтенд, который работает на порту 8080
+    return send_from_directory(os.path.join(app.root_path, 'frontend'), 'index.html')
 
 @app.route('/health', methods=['GET'])
 def health():
