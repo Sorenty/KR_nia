@@ -14,4 +14,4 @@ RUN pip install -r backend/requirements.txt
 EXPOSE 5000
 
 # Запускаем приложение
-CMD ["python", "app.py"]
+CMD ["python", "backend/app.py"]
