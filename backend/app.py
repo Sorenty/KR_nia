@@ -48,9 +48,18 @@ class Item(db.Model):
     table_id = db.Column(db.Integer, db.ForeignKey('table.id'), nullable=False)
 
 @app.route('/', methods=['GET'])
-def home():
-    # Отправляем запрос на фронтенд, который работает на порту 8080
+def serve_frontend():
+    # Отправляем index.html из папки frontend
     return send_from_directory(os.path.join(app.root_path, 'frontend'), 'index.html')
+
+@app.route('/<path:path>', methods=['GET'])
+def serve_static_files(path):
+    # Обрабатываем статические файлы (CSS, JS и т. д.)
+    try:
+        return send_from_directory(os.path.join(app.root_path, 'frontend'), path)
+    except Exception:
+        # Если файл не найден, возвращаем index.html для поддержки SPA
+        return send_from_directory(os.path.join(app.root_path, 'frontend'), 'index.html')
 
 @app.route('/health', methods=['GET'])
 def health():
@@ -70,13 +79,11 @@ def create_table():
             logger.error("Table name is required.")
             return jsonify({"error": "Table name is required."}), 400
         
-        # Проверяем, существует ли уже стол с таким именем
         existing_table = Table.query.filter_by(name=table_name).first()
         if existing_table:
-            logger.error(f"Table with name '{table_name}' already exists.")  # Логируем с уровнем ошибки
-            return jsonify({"error": f"Table with name '{table_name}' already exists."}), 400  # Возвращаем ошибку
+            logger.error(f"Table with name '{table_name}' already exists.")
+            return jsonify({"error": f"Table with name '{table_name}' already exists."}), 400
 
-        # Создаем новый стол
         new_table = Table(name=table_name)
         db.session.add(new_table)
         db.session.commit()
