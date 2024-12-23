@@ -46,6 +46,19 @@ services:
     networks:
       - restaurant-net
 
+  worker:
+    build:
+      context: ./worker
+    container_name: restaurant-worker
+    depends_on:
+      - redis
+    networks:
+      - restaurant-net
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    restart: always
+
 volumes:
   db_data:
 
