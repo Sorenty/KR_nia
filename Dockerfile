@@ -1,15 +1,40 @@
-# Используем базовый образ docker:latest
-FROM docker:latest
+name: Build and Deploy Docker image
 
-# Устанавливаем curl, чтобы скачать docker-compose
-RUN apk add --no-cache curl \
-    && curl -L https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose \
-    && chmod +x /usr/local/bin/docker-compose
+on:
+  push:
+    branches:
+      - main
 
-# Копируем docker-compose.yml в контейнер
-COPY docker-compose.yml /app/docker-compose.yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-WORKDIR /app
+    steps:
+      # Шаг 1: Клонируем репозиторий
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-# Запускаем контейнеры с помощью docker-compose
-CMD ["docker-compose", "up", "-d"]
+      # Шаг 2: Устанавливаем Docker (если требуется, Docker обычно уже есть на ubuntu-latest)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Шаг 3: Логинимся в Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # Шаг 4: Собираем Docker образ
+      - name: Build Docker image
+        run: docker build -t sorenty/order-managment-backend:latest ./backend
+
+      # Шаг 5: Пушим образ в Docker Hub
+      - name: Push Docker image to Docker Hub
+        run: docker push sorenty/order-managment-backend:latest
+
+      # Шаг 6: (Опционально) Деплой или другие действия с контейнером
+      - name: Deploy or test with Docker image
+        run: |
+          # Ваши действия с контейнером
+          docker run sorenty/order-managment-backend:latest
