@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - restaurant-net
+
+  db:
+    image: mysql:8.0
+    container_name: restaurant-db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: restaurant_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - restaurant-net
+
+  backend:
+    build:
+      context: ./backend
+    container_name: restaurant-backend
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "5000:5000"
+    networks:
+      - restaurant-net
+    environment:
+      FLASK_ENV: development
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: restaurant-frontend
+    ports:
+      - "8080:80"
+    networks:
+      - restaurant-net
+
+volumes:
+  db_data:
+
+networks:
+  restaurant-net:
+    driver: bridge
