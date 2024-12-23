@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Устанавливаем зависимости
-RUN pip install -r requirements.txt
+RUN pip install -r backend/requirements.txt
 
 # Открываем порт, на котором будет работать приложение
 EXPOSE 5000
